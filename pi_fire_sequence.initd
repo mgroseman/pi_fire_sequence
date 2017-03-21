@@ -1,0 +1,44 @@
+#! /bin/sh
+#
+# Pi Fire Sequence  watch buttons
+#
+# (C) 2014 Mike Roseman
+# MIT LICENSE
+#
+# This should probably be changed to a systemd unit file at some point, for newer OSes
+
+NAME="watch_buttons.sh"
+DESC="Pi Fire Sequence Daemon"
+SCRIPTDIR=/home/pi/pi_fire_sequence
+DAEMON=${SCRIPTDIR}/${NAME}
+OPTIONS=""
+
+PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/bin
+
+test -f $DAEMON || exit 0
+
+PIDFILE=/var/run/${NAME}.pid
+
+case "$1" in
+   start)
+      echo -n "Starting ${DESC}: "
+      start-stop-daemon --start --quiet --pidfile ${PIDFILE} --background --exec ${DAEMON} --  ${OPTIONS}
+      echo "${NAME}"
+      ;;
+   stop)
+      echo -n "Stopping ${DESC}: "
+      start-stop-daemon --oknodo --stop --quiet --pidfile ${PIDFILE} 
+      echo "${NAME}"
+      ;;
+   restart|force-reload)
+      $0 stop
+      sleep 5
+      $0 start
+      ;;
+   *)
+      echo "Usage: /etc/init.d/${NAME} {start|stop|restart|force-reload}" >&2
+      exit 1
+      ;;
+esac
+exit 0
+
